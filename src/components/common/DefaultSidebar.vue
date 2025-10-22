@@ -309,85 +309,6 @@
         </el-sub-menu>
 
         <el-sub-menu
-          index="media"
-          :disabled="groupDisabled('/media/album', '/media/youtube', '/media/social')"
-        >
-          <template #title>
-            <el-icon><Picture /></el-icon>
-            <span>媒體與相簿</span>
-          </template>
-          <el-menu-item index="/media/album" :disabled="!can('/media/album')"
-            >影音像本</el-menu-item
-          >
-          <el-menu-item index="/media/youtube" :disabled="!can('/media/youtube')"
-            >YouTube 來源管理</el-menu-item
-          >
-          <el-menu-item index="/media/social" :disabled="!can('/media/social')"
-            >社群連結管理</el-menu-item
-          >
-        </el-sub-menu>
-
-        <el-sub-menu
-          index="files"
-          :disabled="groupDisabled('/files/center', '/files/download-page')"
-        >
-          <template #title>
-            <el-icon><Folder /></el-icon>
-            <span>檔案與下載</span>
-          </template>
-          <el-menu-item index="/files/center" :disabled="!can('/files/center')"
-            >檔案中心</el-menu-item
-          >
-          <el-menu-item
-            index="/files/download-page"
-            :disabled="!can('/files/download-page')"
-            >下載清單頁設定</el-menu-item
-          >
-        </el-sub-menu>
-
-        <el-sub-menu
-          index="calendar"
-          :disabled="groupDisabled('/calendar/site', '/calendar/mayor')"
-        >
-          <template #title>
-            <el-icon><Calendar /></el-icon>
-            <span>行事曆與行程</span>
-          </template>
-          <el-menu-item index="/calendar/site" :disabled="!can('/calendar/site')"
-            >行事曆管理</el-menu-item
-          >
-          <el-menu-item index="/calendar/mayor" :disabled="!can('/calendar/mayor')"
-            >鄉長行程</el-menu-item
-          >
-        </el-sub-menu>
-
-        <el-sub-menu index="progress" :disabled="groupDisabled('/progress/tracker')">
-          <template #title>
-            <el-icon><TrendCharts /></el-icon>
-            <span>進度查詢</span>
-          </template>
-          <el-menu-item index="/progress/tracker" :disabled="!can('/progress/tracker')"
-            >進度查詢</el-menu-item
-          >
-        </el-sub-menu>
-
-        <el-sub-menu
-          index="internal"
-          :disabled="groupDisabled('/internal/dept', '/internal/global')"
-        >
-          <template #title>
-            <el-icon><MessageBox /></el-icon>
-            <span>內部公告</span>
-          </template>
-          <el-menu-item index="/internal/dept" :disabled="!can('/internal/dept')"
-            >各課室公告</el-menu-item
-          >
-          <el-menu-item index="/internal/global" :disabled="!can('/internal/global')"
-            >總體公告</el-menu-item
-          >
-        </el-sub-menu>
-
-        <el-sub-menu
           index="system"
           :disabled="
             groupDisabled(
@@ -410,13 +331,10 @@
             <el-icon><Setting /></el-icon>
             <span>系統管理</span>
           </template>
-          <el-menu-item index="/system/units" :disabled="!can('/system/units')"
-            >單位/課室管理</el-menu-item
-          >
           <el-menu-item
-            index="/system/district-admin"
-            :disabled="!can('/system/district-admin')"
-            >村里/行政區管理</el-menu-item
+            index="/system/menus-pages"
+            :disabled="!can('/system/menus-pages')"
+            >選單與頁面樹</el-menu-item
           >
           <el-menu-item index="/system/roles" :disabled="!can('/system/roles')"
             >角色與權限</el-menu-item
@@ -426,33 +344,6 @@
           >
           <el-menu-item index="/system/categories" :disabled="!can('/system/categories')"
             >分類與標籤</el-menu-item
-          >
-          <el-menu-item
-            index="/system/menus-pages"
-            :disabled="!can('/system/menus-pages')"
-            >選單與頁面樹</el-menu-item
-          >
-          <el-menu-item index="/system/workflow" :disabled="!can('/system/workflow')"
-            >審核流程設定</el-menu-item
-          >
-          <el-menu-item index="/system/site" :disabled="!can('/system/site')"
-            >站台設定</el-menu-item
-          >
-          <el-menu-item
-            index="/system/friend-links"
-            :disabled="!can('/system/friend-links')"
-            >相關連結/友站管理</el-menu-item
-          >
-          <el-menu-item index="/system/banners" :disabled="!can('/system/banners')"
-            >橫幅/輪播管理</el-menu-item
-          >
-          <el-menu-item index="/system/audit" :disabled="!can('/system/audit')"
-            >操作日誌與稽核</el-menu-item
-          >
-          <el-menu-item
-            index="/system/import-export"
-            :disabled="!can('/system/import-export')"
-            >匯入匯出工具</el-menu-item
           >
         </el-sub-menu>
       </el-menu>
