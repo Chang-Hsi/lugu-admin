@@ -1,5 +1,5 @@
 <template>
-  <div class="p-2 md:p-4 space-y-4">
+  <div class="p-2 md:p-4 space-y-2">
     <!-- 標題列 -->
     <div class="flex items-center justify-between">
       <div class="text-lg font-bold text-slate-700">最新消息</div>
@@ -107,7 +107,6 @@
       <el-table
         :data="rows"
         v-loading="loading"
-        border
         header-cell-class-name="table-header"
         @selection-change="(val) => (multipleSelection = val)"
       >

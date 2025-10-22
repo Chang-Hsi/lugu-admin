@@ -293,7 +293,7 @@
         >
           <template #title>
             <el-icon><ChatDotRound /></el-icon>
-            <span>互動參與</span>
+            <span>線上服務交流</span>
           </template>
           <el-menu-item
             index="/engagement/surveys"
@@ -304,7 +304,7 @@
             >投票管理</el-menu-item
           >
           <el-menu-item index="/engagement/qa" :disabled="!can('/engagement/qa')"
-            >問答管理</el-menu-item
+            >表單下載</el-menu-item
           >
         </el-sub-menu>
 

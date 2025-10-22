@@ -1,5 +1,5 @@
 <template>
-  <div class="p-2 md:p-4 space-y-4">
+  <div class="p-2 md:p-4 space-y-2">
     <!-- 頁首 -->
     <div class="flex items-center justify-between">
       <div class="text-lg font-bold text-slate-700">關於鹿谷</div>
