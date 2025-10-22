@@ -1,12 +1,10 @@
 <template>
   <div class="p-2 md:p-4 space-y-2">
-    <!-- 標題列 -->
     <div class="flex items-center justify-between">
       <div class="text-lg font-bold text-slate-700">政策相關</div>
       <div class="text-sm text-slate-500">目前分頁：{{ currentTab.label }}</div>
     </div>
 
-    <!-- 綠色 TabBar -->
     <div class="flex flex-wrap gap-2">
       <button
         v-for="t in TABS"
@@ -21,7 +19,6 @@
       </button>
     </div>
 
-    <!-- 篩選列 -->
     <el-card shadow="never" class="border! border-gray-200!">
       <el-form
         :inline="true"
@@ -54,13 +51,13 @@
         </el-form-item>
 
         <div class="flex gap-2 ml-auto">
-          <el-button type="primary" size="" @click="onSearch">查詢</el-button>
-          <el-button size="" @click="resetQuery">重設</el-button>
+          <el-button type="primary" @click="onSearch">查詢</el-button>
+          <el-button @click="resetQuery">重設</el-button>
+          <el-button type="success" @click="openCreate">新增</el-button>
         </div>
       </el-form>
     </el-card>
 
-    <!-- 列表（Element Admin 風格：卡片 + 邊框表格 + 固定表頭色） -->
     <el-card shadow="never" class="border! border-gray-200!">
       <el-table
         :data="rows"
@@ -91,6 +88,16 @@
           }}</template>
         </el-table-column>
         <el-table-column label="點閱率" width="100" align="center" prop="views" />
+
+        <el-table-column label="操作" width="180" fixed="right">
+          <template #default="{ row }">
+            <div class="flex items-center gap-2">
+              <el-button link type="primary" @click="openEdit(row)">編輯</el-button>
+              <el-button link type="danger" @click="onRemove(row)">刪除</el-button>
+              <el-button link type="success" @click="onDownload(row)">下載</el-button>
+            </div>
+          </template>
+        </el-table-column>
       </el-table>
 
       <div class="flex justify-end mt-3">
@@ -109,12 +116,72 @@
         />
       </div>
     </el-card>
+
+    <el-dialog
+      v-model="visible"
+      :title="isEditing ? '編輯文章' : '新增文章'"
+      width="640px"
+    >
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        label-width="84px"
+        class="space-y-2"
+      >
+        <el-form-item label="標題" prop="title">
+          <el-input v-model="form.title" placeholder="請輸入標題" />
+        </el-form-item>
+        <el-form-item label="簡介" prop="summary">
+          <el-input v-model="form.summary" placeholder="請輸入簡介" />
+        </el-form-item>
+        <el-form-item label="內容" prop="content">
+          <el-input
+            v-model="form.content"
+            type="textarea"
+            :rows="6"
+            placeholder="請輸入內容"
+          />
+        </el-form-item>
+        <el-form-item label="發布單位" prop="dept">
+          <el-input v-model="form.dept" placeholder="請輸入發布單位" />
+        </el-form-item>
+        <el-form-item label="發布日期" prop="publishAt">
+          <el-date-picker
+            v-model="form.publishAt"
+            type="date"
+            value-format="YYYY-MM-DD"
+            placeholder="選擇日期"
+            style="width: 200px"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <el-button @click="visible = false">取消</el-button>
+          <el-button type="primary" @click="onSubmit">{{
+            isEditing ? "更新" : "新增"
+          }}</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
+/**
+ * 功能說明
+ * 1) 新增按鈕（右上角）→ 開啟彈窗
+ * 2) 表格最後一欄「操作」：編輯／刪除／下載
+ *    - 編輯：帶入該列資料，開啟彈窗
+ *    - 刪除：確認後自資料源移除（localStorage 模擬）
+ *    - 下載：以開新視窗排版 + window.print()，使用者可選擇「另存為 PDF」
+ * 3) 彈窗欄位：標題、簡介、內容、發布單位、發布日期
+ * 4) 資料儲存：使用 localStorage，維持你原有的假資料結構並增補 content 欄位
+ */
 import { ref, reactive, computed, onMounted } from "vue";
 import dayjs from "dayjs";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 /** Tab 定義（依你的截圖） */
 const TABS = [
@@ -137,6 +204,33 @@ const rows = ref([]);
 const all = ref([]); // 目前分頁的所有資料
 const loading = ref(false);
 
+/** 新增/編輯彈窗 */
+const visible = ref(false);
+const isEditing = ref(false);
+const editingId = ref(null);
+const formRef = ref();
+const form = reactive({
+  id: "",
+  tab: "",
+  group: "政策相關",
+  subcat: "",
+  title: "",
+  summary: "",
+  content: "",
+  dept: "",
+  publishAt: dayjs().format("YYYY-MM-DD"),
+  views: 0,
+});
+
+/** 表單驗證 */
+const rules = {
+  title: [{ required: true, message: "請填寫標題", trigger: "blur" }],
+  summary: [{ required: true, message: "請填寫簡介", trigger: "blur" }],
+  content: [{ required: true, message: "請填寫內容", trigger: "blur" }],
+  dept: [{ required: true, message: "請填寫發布單位", trigger: "blur" }],
+  publishAt: [{ required: true, message: "請選擇日期", trigger: "change" }],
+};
+
 /** 本地儲存鍵 */
 const LS_KEY = "policies.plain.v1";
 
@@ -154,19 +248,20 @@ function seedIfEmpty() {
   const DEPTS = ["政風室", "秘書室", "人事室", "工務課", "清潔隊", "社會課"];
   const make = (i, tabKey) => ({
     id: nid(),
-    tab: tabKey, // 對應 TABS.key
+    tab: tabKey,
     group: "政策相關",
     subcat: TABS.find((t) => t.key === tabKey)?.label || "",
     title:
       ["年度施政計畫", "自治條例修正", "政策宣導專區", "遊說法資訊", "法規宣導案例"][
         i % 5
       ] + `（示例 ${i + 1}）`,
-    summary: i % 2 === 0 ? "這是一段摘要文字，用於列表輔助說明與 SEO。" : "",
+    summary: i % 2 === 0 ? "這是一段摘要文字，用於列表輔助說明。" : "",
+    content:
+      "這是示例內容。可在編輯時修改成實際文章內容。段落一。\n\n段落二：可輸入更長的文字，下載時會印在 PDF 中。",
     dept: DEPTS[i % DEPTS.length],
     publishAt: base.add(i * 17, "day").format("YYYY-MM-DD"),
     views: Math.floor(Math.random() * 900) + 120,
   });
-  // 每個 tab 造 18 筆
   for (const t of TABS) {
     for (let i = 0; i < 18; i++) pool.push(make(i, t.key));
   }
@@ -179,6 +274,27 @@ const api = {
     await sleep(120);
     const raw = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
     return raw.filter((x) => x.tab === tab);
+  },
+  async createOne(payload) {
+    await sleep(80);
+    const raw = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+    raw.push(payload);
+    localStorage.setItem(LS_KEY, JSON.stringify(raw));
+  },
+  async updateOne(id, patch) {
+    await sleep(80);
+    const raw = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+    const idx = raw.findIndex((x) => x.id === id);
+    if (idx >= 0) {
+      raw[idx] = { ...raw[idx], ...patch };
+      localStorage.setItem(LS_KEY, JSON.stringify(raw));
+    }
+  },
+  async removeOne(id) {
+    await sleep(80);
+    const raw = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+    const next = raw.filter((x) => x.id !== id);
+    localStorage.setItem(LS_KEY, JSON.stringify(next));
   },
 };
 function sleep(ms) {
@@ -202,7 +318,6 @@ async function load() {
 }
 function applyQuery() {
   let list = clone(all.value);
-  // 日期
   if (Array.isArray(query.range) && query.range[0] && query.range[1]) {
     const [start, end] = query.range;
     const s = dayjs(start + " 00:00:00");
@@ -211,14 +326,14 @@ function applyQuery() {
       (x) => dayjs(x.publishAt).isAfter(s) && dayjs(x.publishAt).isBefore(e)
     );
   }
-  // 關鍵字：標題 / 摘要 / 部分欄位
   if (query.keyword?.trim()) {
     const k = query.keyword.trim().toLowerCase();
     list = list.filter((x) =>
-      `${x.title} ${x.summary} ${x.dept} ${x.subcat}`.toLowerCase().includes(k)
+      `${x.title} ${x.summary} ${x.content} ${x.dept} ${x.subcat}`
+        .toLowerCase()
+        .includes(k)
     );
   }
-  // 排序：日期新→舊
   list.sort((a, b) => dayjs(b.publishAt).valueOf() - dayjs(a.publishAt).valueOf());
 
   total.value = list.length;
@@ -235,6 +350,127 @@ function resetQuery() {
   onSearch();
 }
 
+/** 新增 / 編輯 */
+function resetForm() {
+  form.id = "";
+  form.tab = active.value;
+  form.group = "政策相關";
+  form.subcat = currentTab.value?.label || "";
+  form.title = "";
+  form.summary = "";
+  form.content = "";
+  form.dept = "";
+  form.publishAt = dayjs().format("YYYY-MM-DD");
+  form.views = Math.floor(Math.random() * 50) + 1;
+}
+function openCreate() {
+  isEditing.value = false;
+  editingId.value = null;
+  resetForm();
+  visible.value = true;
+}
+function openEdit(row) {
+  isEditing.value = true;
+  editingId.value = row.id;
+  form.id = row.id;
+  form.tab = row.tab;
+  form.group = row.group;
+  form.subcat = row.subcat;
+  form.title = row.title;
+  form.summary = row.summary || "";
+  form.content = row.content || "";
+  form.dept = row.dept || "";
+  form.publishAt = row.publishAt || dayjs().format("YYYY-MM-DD");
+  form.views = row.views || 0;
+  visible.value = true;
+}
+function onSubmit() {
+  formRef.value?.validate(async (ok) => {
+    if (!ok) return;
+    if (isEditing.value && editingId.value) {
+      await api.updateOne(editingId.value, { ...form });
+      ElMessage.success("已更新");
+    } else {
+      const payload = {
+        ...clone(form),
+        id: nid(),
+        tab: active.value,
+        group: "政策相關",
+        subcat: currentTab.value?.label || "",
+      };
+      await api.createOne(payload);
+      ElMessage.success("已新增");
+    }
+    visible.value = false;
+    await load();
+  });
+}
+
+/** 刪除 */
+async function onRemove(row) {
+  try {
+    await ElMessageBox.confirm(`確定要刪除「${row.title}」嗎？`, "提示", {
+      type: "warning",
+      confirmButtonText: "刪除",
+      cancelButtonText: "取消",
+    });
+    await api.removeOne(row.id);
+    ElMessage.success("已刪除");
+    await load();
+  } catch {
+    /* 使用者取消 */
+  }
+}
+
+// 產生 .txt 內容（依你要的欄位順序與格式）
+function buildTxt(row) {
+  const lines = [
+    `標題：${row.title || ""}`,
+    `分類：${row.group || ""}／${row.subcat || ""}`,
+    `發布單位：${row.dept || ""}`,
+    `發布日期：${fmtDate(row.publishAt, "YYYY/MM/DD")}`,
+    ``,
+    `簡介：`,
+    `${row.summary || ""}`,
+    ``,
+    `內容：`,
+    `${row.content || ""}`,
+  ];
+  return lines.join("\n");
+}
+
+// 安全檔名（移除不合法字元）
+function safeFilename(s) {
+  const base = (s || "未命名").replace(/[\\/:*?"<>|]+/g, "_").trim();
+  return base.slice(0, 80) || "未命名";
+}
+
+// 下載為純文字 .txt
+function onDownload(row) {
+  const text = buildTxt(row);
+  // 加上 UTF-8 BOM，避免 Windows 記事本中文亂碼
+  const blob = new Blob(["\ufeff" + text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const datePart = dayjs(row.publishAt || new Date()).format("YYYYMMDD");
+  a.href = url;
+  a.download = `${safeFilename(row.title)}_${datePart}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/** HTML 字元逃脫（避免斷印） */
+function escapeHtml(s) {
+  return String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 /** lifecycle */
 onMounted(async () => {
   seedIfEmpty();
@@ -243,9 +479,8 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* ElementAdmin 風格：表頭深色、字白 */
 :deep(.table-header) {
-  background-color: #0f766e !important; /* teal-700 */
+  background-color: #0f766e !important;
   color: #fff !important;
   font-weight: 600;
 }
