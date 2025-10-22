@@ -88,9 +88,9 @@ export const usePermStore = defineStore('perm', {
         '便民服務/鹿谷鄉銘恩堂': '/services/memorial',
 
         '代表會專區/主席介紹': '/council/chair',
-        '代表會專區/組織介紹/架構': '/council/org',
-        '代表會專區/代表服務電話': '/council/contacts',
-        '代表會專區/法規公告宣導': '/council/law-announce',
+        '代表會專區/出國考察報告': '/council/org',
+        '代表會專區/代表會活動': '/council/contacts',
+        '代表會專區/會議資訊': '/council/law-announce',
         '代表會專區/出國考察報告': '/council/overseas-report',
         '代表會專區/代表會活動': '/council/activities',
         '代表會專區/會議資訊': '/council/meetings',

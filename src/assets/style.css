@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+/* ===== Lugu Admin global theme (Element Plus) ===== */
+:root{
+  /* 主色改為綠色（emerald-600） */
+  --el-color-primary:        #059669;
+  /* 深色用在 active */
+  --el-color-primary-dark-2: #047857;
+  /* hover / disabled 等會用到的淺色階（可依喜好微調） */
+  --el-color-primary-light-3:#34d399;
+  --el-color-primary-light-5:#6ee7b7;
+  --el-color-primary-light-7:#a7f3d0;
+  --el-color-primary-light-8:#d1fae5;
+  --el-color-primary-light-9:#ecfdf5;
+}
+
+/* 表頭綠底白字（你的列表用這個 class） */
+.table-header{
+  background-color:#0f766e !important; /* teal-700 */
+  color:#fff !important;
+  font-weight:600;
+}
+
+/* 其他你想保留的通用修飾 */
+.el-form--inline .el-form-item{ margin-bottom:0; }
+.tox-tinymce{ border-radius:8px; }

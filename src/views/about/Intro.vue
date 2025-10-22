@@ -3,7 +3,7 @@
     <!-- 頁首 -->
     <div class="flex items-center justify-between">
       <div class="text-lg font-bold text-slate-700">關於鹿谷</div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center">
         <el-button @click="load" :loading="loading">重新載入</el-button>
         <el-button @click="openPreview">預覽</el-button>
         <el-button type="primary" @click="publish" :loading="saving">發布</el-button>

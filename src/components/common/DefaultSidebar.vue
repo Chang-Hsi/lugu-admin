@@ -38,7 +38,7 @@
         >
           <template #title>
             <el-icon><HomeFilled /></el-icon>
-            <span>首頁與導覽</span>
+            <span>首頁管理</span>
           </template>
           <el-menu-item index="/home-nav/blocks" :disabled="!can('/home-nav/blocks')"
             >首頁區塊設定</el-menu-item
@@ -66,7 +66,7 @@
         >
           <template #title>
             <el-icon><Bell /></el-icon>
-            <span>消息與活動</span>
+            <span>熱門消息</span>
           </template>
           <el-menu-item
             index="/news-events/latest"
@@ -160,54 +160,23 @@
         >
           <template #title>
             <el-icon><Document /></el-icon>
-            <span>資訊公開與政策</span>
+            <span>法規政策</span>
           </template>
-          <el-menu-item
-            index="/open-policy/engineering"
-            :disabled="!can('/open-policy/engineering')"
-            >工程類</el-menu-item
-          >
-          <el-menu-item
-            index="/open-policy/budget"
-            :disabled="!can('/open-policy/budget')"
-            >經費類</el-menu-item
-          >
-          <el-menu-item
-            index="/open-policy/integrity"
-            :disabled="!can('/open-policy/integrity')"
-            >廉政類</el-menu-item
-          >
-          <el-menu-item index="/open-policy/law" :disabled="!can('/open-policy/law')"
-            >法治類</el-menu-item
-          >
           <el-menu-item index="/open-policy/plan" :disabled="!can('/open-policy/plan')"
-            >施政計畫</el-menu-item
+            >政策相關</el-menu-item
           >
           <el-menu-item
             index="/open-policy/law-change"
             :disabled="!can('/open-policy/law-change')"
-            >法規增修</el-menu-item
+            >年度經費</el-menu-item
           >
           <el-menu-item
             index="/open-policy/promotion"
             :disabled="!can('/open-policy/promotion')"
-            >政策宣導</el-menu-item
+            >資訊公開</el-menu-item
           >
           <el-menu-item index="/open-policy/lobby" :disabled="!can('/open-policy/lobby')"
-            >遊說法專區</el-menu-item
-          >
-          <el-menu-item
-            index="/open-policy/year-budget"
-            :disabled="!can('/open-policy/year-budget')"
-            >年度經費</el-menu-item
-          >
-          <el-menu-item
-            index="/open-policy/approved"
-            :disabled="!can('/open-policy/approved')"
-            >核定計畫專區</el-menu-item
-          >
-          <el-menu-item index="/open-policy/major" :disabled="!can('/open-policy/major')"
-            >重大計畫</el-menu-item
+            >廉政圖地</el-menu-item
           >
           <el-menu-item
             index="/open-policy/construction"
@@ -223,49 +192,6 @@
             index="/open-policy/pedestrian-safety"
             :disabled="!can('/open-policy/pedestrian-safety')"
             >人行安全計畫</el-menu-item
-          >
-        </el-sub-menu>
-
-        <el-sub-menu
-          index="disaster"
-          :disabled="
-            groupDisabled(
-              '/disaster/contacts',
-              '/disaster/shelters',
-              '/disaster/preparedness',
-              '/disaster/links',
-              '/disaster/downloads',
-              '/disaster/hazard-maps'
-            )
-          "
-        >
-          <template #title>
-            <el-icon><Warning /></el-icon>
-            <span>防災專區</span>
-          </template>
-          <el-menu-item index="/disaster/contacts" :disabled="!can('/disaster/contacts')"
-            >通報聯繫窗口</el-menu-item
-          >
-          <el-menu-item index="/disaster/shelters" :disabled="!can('/disaster/shelters')"
-            >收容場所</el-menu-item
-          >
-          <el-menu-item
-            index="/disaster/preparedness"
-            :disabled="!can('/disaster/preparedness')"
-            >防災整備與應變作為</el-menu-item
-          >
-          <el-menu-item index="/disaster/links" :disabled="!can('/disaster/links')"
-            >相關網站連結</el-menu-item
-          >
-          <el-menu-item
-            index="/disaster/downloads"
-            :disabled="!can('/disaster/downloads')"
-            >文件下載專區</el-menu-item
-          >
-          <el-menu-item
-            index="/disaster/hazard-maps"
-            :disabled="!can('/disaster/hazard-maps')"
-            >災害潛勢與防災地圖</el-menu-item
           >
         </el-sub-menu>
 
@@ -290,6 +216,9 @@
           </template>
           <el-menu-item index="/services/welfare" :disabled="!can('/services/welfare')"
             >社會福利</el-menu-item
+          >
+          <el-menu-item index="/disaster/contacts" :disabled="!can('/disaster/contacts')"
+            >防災專區</el-menu-item
           >
           <el-menu-item
             index="/services/kindergarten"
@@ -336,21 +265,10 @@
         >
           <template #title>
             <el-icon><OfficeBuilding /></el-icon>
-            <span>代表會專區</span>
+            <span>代表會管理</span>
           </template>
           <el-menu-item index="/council/chair" :disabled="!can('/council/chair')"
-            >主席介紹</el-menu-item
-          >
-          <el-menu-item index="/council/org" :disabled="!can('/council/org')"
-            >組織介紹/架構</el-menu-item
-          >
-          <el-menu-item index="/council/contacts" :disabled="!can('/council/contacts')"
-            >代表服務電話</el-menu-item
-          >
-          <el-menu-item
-            index="/council/law-announce"
-            :disabled="!can('/council/law-announce')"
-            >法規公告宣導</el-menu-item
+            >鄉民代表會</el-menu-item
           >
           <el-menu-item
             index="/council/overseas-report"
