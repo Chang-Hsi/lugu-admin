@@ -343,7 +343,7 @@
             >帳號管理</el-menu-item
           >
           <el-menu-item index="/system/categories" :disabled="!can('/system/categories')"
-            >分類與標籤</el-menu-item
+            >推播設定</el-menu-item
           >
         </el-sub-menu>
       </el-menu>

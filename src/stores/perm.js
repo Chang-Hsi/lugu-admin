@@ -118,7 +118,7 @@ export const usePermStore = defineStore('perm', {
         '系統管理/村里/行政區管理': '/system/district-admin',
         '系統管理/角色與權限': '/system/roles',
         '系統管理/帳號管理': '/system/accounts',
-        '系統管理/分類與標籤': '/system/categories',
+        '系統管理/推播設定': '/system/categories',
         '系統管理/選單與頁面樹': '/system/menus-pages',
         '系統管理/審核流程設定': '/system/workflow',
         '系統管理/站台設定': '/system/site',
