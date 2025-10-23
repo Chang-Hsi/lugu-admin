@@ -159,8 +159,7 @@
           <!-- 新增：推播管道（單選） -->
           <el-form-item label="推播管道" prop="channel">
             <el-radio-group v-model="editor.form.channel">
-              <el-radio label="email">Email</el-radio>
-              <el-radio label="sms">手機簡訊</el-radio>
+              <el-radio label="email">LINE</el-radio>
             </el-radio-group>
           </el-form-item>
 
