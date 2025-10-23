@@ -85,15 +85,24 @@
           </template>
         </el-table-column>
 
+        <!-- 新增欄位：報名人數（含 CSV 下載圖示） -->
+        <el-table-column label="報名人數" width="160" align="center">
+          <template #default="{ row }">
+            <div class="flex items-center justify-center gap-2">
+              <span>{{ row.regCount ?? FAKE_REGS.length }}</span>
+              <el-button link @click="downloadCsv(row)" aria-label="下載報名清單">
+                <el-icon><Download /></el-icon>
+              </el-button>
+            </div>
+          </template>
+        </el-table-column>
+
+        <!-- 調整欄位：移除 switch，改為刪除按鈕 -->
         <el-table-column label="項目操作" width="200" align="center" fixed="right">
           <template #default="{ row }">
             <div class="flex items-center justify-center gap-2">
               <el-button size="small" @click="openEditor(row)">編輯</el-button>
-              <el-switch
-                v-model="row.enabled"
-                inline-prompt
-                @change="toggleEnabled(row)"
-              />
+              <el-button size="small" type="danger">刪除</el-button>
             </div>
           </template>
         </el-table-column>
@@ -165,7 +174,6 @@
             <el-input-number v-model="editor.form.quota" :min="1" :max="5000" />
           </el-form-item>
 
-          <!-- 每人限報（單獨一列） -->
           <el-form-item label="每人限報">
             <div class="flex items-center gap-2">
               <el-input-number v-model="editor.form.limitPerUser" :min="1" :max="10" />
@@ -252,14 +260,17 @@
 
 <script setup>
 /**
- * 功能差異：
- * - 換成「活動報名」資料模型：regStart/regEnd（報名時間）、eventStart/eventEnd（舉辦日期）、quota/候補/收費…等
- * - 表格欄位：報名狀態、舉辦日期、活動名稱、報名時間、項目操作（啟用切換、編輯）
- * - 鹿谷鄉情境：預設活動池 topicsLugu + 類別 CATEGORIES + 場地樣本
+ * 本次調整（重要說明）：
+ * 1) 新增「報名人數」欄位，並在數字後加下載圖示，點擊呼叫 downloadCsv(row) 下載 CSV。
+ * 2) 「項目操作」欄位：移除 el-switch，改為「刪除」按鈕（未實作功能）。
+ * 3) 新增常數 FAKE_REGS（靜態假資料），CSV 內容一律取自此陣列；為了視覺一致，seed 時將每筆的 regCount 設為 FAKE_REGS.length。
+ * 4) 移除：toggleEnabled 函式（因為已不再使用 switch）。
  */
+
 import { ref, reactive, onMounted } from "vue";
 import dayjs from "dayjs";
 import { ElMessage } from "element-plus";
+import { Download } from "@element-plus/icons-vue";
 
 /** 類別／活動樣本（鹿谷） */
 const CATEGORIES = [
@@ -290,6 +301,20 @@ const topicsLugu = [
   "災害防救避難演練",
 ];
 
+/** 靜態假資料：報名清單（CSV 來源） */
+const FAKE_REGS = [
+  { id: "R001", name: "王小明", phone: "0912-345-678", email: "ming@example.com" },
+  { id: "R002", name: "陳小華", phone: "0922-111-333", email: "hua@example.com" },
+  { id: "R003", name: "林美麗", phone: "0933-222-444", email: "mei@example.com" },
+  { id: "R004", name: "張大同", phone: "0955-666-777", email: "tong@example.com" },
+  { id: "R005", name: "李小芳", phone: "0966-888-999", email: "fang@example.com" },
+  { id: "R006", name: "吳阿豪", phone: "0977-000-111", email: "ahao@example.com" },
+  { id: "R007", name: "周芷若", phone: "0988-222-333", email: "zr@example.com" },
+  { id: "R008", name: "趙信", phone: "0911-555-444", email: "xin@example.com" },
+  { id: "R009", name: "曾國城", phone: "0938-123-456", email: "cheng@example.com" },
+  { id: "R010", name: "黃雅婷", phone: "0927-987-654", email: "ting@example.com" },
+];
+
 /** 狀態 */
 const query = reactive({ range: "", keyword: "" });
 const page = reactive({ index: 1, size: 10 });
@@ -307,7 +332,7 @@ const fmt = (v, f = "YYYY/MM/DD") => (v ? dayjs(v).format(f) : "");
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const nid = (p = "e") => `${p}_` + Math.random().toString(36).slice(2, 9);
 
-/** 產生鹿谷活動假資料 */
+/** 產生鹿谷活動假資料（含 regCount） */
 function seedIfEmpty() {
   const raw = localStorage.getItem(LS_KEY);
   if (raw) return;
@@ -341,6 +366,8 @@ function seedIfEmpty() {
       eventStart: startEvent.format("YYYY-MM-DD"),
       eventEnd: endEvent ? endEvent.format("YYYY-MM-DD") : null,
       updatedAt: dayjs().toISOString(),
+      /** 新增：報名人數（與 CSV 假資料筆數一致） */
+      regCount: FAKE_REGS.length,
     });
   }
   localStorage.setItem(LS_KEY, JSON.stringify(list));
@@ -387,7 +414,11 @@ function statusOf(row) {
 async function load() {
   loading.value = true;
   try {
-    all.value = await api.list();
+    const raw = await api.list();
+    const upgraded = raw.map(withDefaults);
+    // 回寫升級後資料，避免每次都要補
+    localStorage.setItem(LS_KEY, JSON.stringify(upgraded));
+    all.value = upgraded;
     applyQuery();
   } finally {
     loading.value = false;
@@ -554,10 +585,37 @@ async function saveEvent() {
   }
 }
 
-async function toggleEnabled(row) {
-  row.enabled = !!row.enabled;
-  await api.saveOne(clone(row));
-  ElMessage.success(row.enabled ? "已啟用" : "已停用");
+function withDefaults(x) {
+  const y = { ...x };
+  if (!Number.isFinite(y.regCount)) y.regCount = FAKE_REGS.length; // 舊資料沒有就補上
+  return y;
+}
+
+/** 新增：下載 CSV（內容使用靜態假資料 FAKE_REGS；筆數 = row.regCount） */
+function downloadCsv(row) {
+  const count = Number(row?.regCount) || FAKE_REGS.length;
+  const data = FAKE_REGS.slice(0, Math.max(1, Math.min(count, FAKE_REGS.length)));
+  const header = ["編號", "報名人姓名", "報名人手機號碼", "報名人郵箱"];
+  const lines = [header.join(",")].concat(
+    data.map((r) => [r.id, r.name, r.phone, r.email].map(escapeCsv).join(","))
+  );
+  const csv = "\uFEFF" + lines.join("\n"); // 加 BOM，避免 Excel 亂碼
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = `${row?.title || "活動"}_報名清單.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function escapeCsv(v) {
+  const s = String(v ?? "");
+  if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+    return `"${s.replace(/"/g, '""')}"`;
+  }
+  return s;
 }
 
 /** lifecycle */
